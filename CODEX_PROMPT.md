@@ -4,30 +4,30 @@ Build a complete, production-ready Next.js 15 App Router application.
 
 PROJECT: hn-comment-collapser
 HEADLINE: Persistent comment collapsing for any website
-WHAT: None
-WHY: None
-WHO PAYS: None
+WHAT: Browser extension that remembers which comments you've collapsed across any website with threaded discussions. Works on HN, Reddit, GitHub issues, and forums - your collapsed state persists between visits and devices.
+WHY: Power users spend hours daily in comment threads but lose their reading progress every page refresh. Current solutions are site-specific and don't sync. This saves 10+ minutes daily for heavy forum users.
+WHO PAYS: Software developers, researchers, and content creators who regularly engage with technical discussions on multiple platforms. People who follow long GitHub issue threads or moderate online communities.
 NICHE: productivity-tools
 PRICE: $$7/mo
 
 ARCHITECTURE SPEC:
-A browser extension with a web dashboard that allows users to persistently collapse comments on any website. The extension syncs collapsed state across devices via a cloud backend, while the web app handles user management and subscription billing.
+Browser extension with content script injection for comment detection/collapsing, background service worker for cross-site state management, and Next.js web app for user dashboard/sync. Cloud backend stores collapsed comment state with device synchronization via user accounts.
 
 PLANNED FILES:
 - extension/manifest.json
 - extension/content-script.js
 - extension/background.js
 - extension/popup.html
-- web/pages/index.js
-- web/pages/dashboard.js
-- web/pages/api/auth/[...nextauth].js
-- web/pages/api/collapsed-comments.js
-- web/pages/api/webhooks/lemonsqueezy.js
-- web/components/PricingCard.js
-- web/lib/database.js
-- web/lib/lemonsqueezy.js
+- extension/popup.js
+- web-app/pages/api/auth/[...nextauth].js
+- web-app/pages/api/comments/sync.js
+- web-app/pages/dashboard.js
+- web-app/pages/index.js
+- web-app/components/ExtensionDownload.js
+- web-app/lib/db.js
+- web-app/lib/lemonsqueezy.js
 
-DEPENDENCIES: next, tailwindcss, next-auth, prisma, @prisma/client, lemonsqueezy.js, @lemonsqueezy/lemonsqueezy.js, stripe, react, typescript
+DEPENDENCIES: next, tailwindcss, next-auth, prisma, @prisma/client, lemonsqueezy.js, @lemonsqueezy/lemonsqueezy.js, axios, uuid
 
 REQUIREMENTS:
 - Next.js 15 with App Router (app/ directory)
@@ -35,17 +35,33 @@ REQUIREMENTS:
 - Tailwind CSS v4
 - shadcn/ui components (npx shadcn@latest init, then add needed components)
 - Dark theme ONLY — background #0d1117, no light mode
-- Lemon Squeezy checkout overlay for payments
+- Stripe Payment Link for payments (hosted checkout — use the URL directly as the Buy button href)
 - Landing page that converts: hero, problem, solution, pricing, FAQ
 - The actual tool/feature behind a paywall (cookie-based access after purchase)
 - Mobile responsive
 - SEO meta tags, Open Graph tags
 - /api/health endpoint that returns {"status":"ok"}
+- NO HEAVY ORMs: Do NOT use Prisma, Drizzle, TypeORM, Sequelize, or Mongoose. If the tool needs persistence, use direct SQL via `pg` (Postgres) or `better-sqlite3` (local), or just filesystem JSON. Reason: these ORMs require schema files and codegen steps that fail on Vercel when misconfigured.
+- INTERNAL FILE DISCIPLINE: Every internal import (paths starting with `@/`, `./`, or `../`) MUST refer to a file you actually create in this build. If you write `import { Card } from "@/components/ui/card"`, then `components/ui/card.tsx` MUST exist with a real `export const Card` (or `export default Card`). Before finishing, scan all internal imports and verify every target file exists. Do NOT use shadcn/ui patterns unless you create every component from scratch — easier path: write all UI inline in the page that uses it.
+- DEPENDENCY DISCIPLINE: Every package imported in any .ts, .tsx, .js, or .jsx file MUST be
+  listed in package.json dependencies (or devDependencies for build-only). Before finishing,
+  scan all source files for `import` statements and verify every external package (anything
+  not starting with `.` or `@/`) appears in package.json. Common shadcn/ui peers that MUST
+  be added if used:
+  - lucide-react, clsx, tailwind-merge, class-variance-authority
+  - react-hook-form, zod, @hookform/resolvers
+  - @radix-ui/* (for any shadcn component)
+- After running `npm run build`, if you see "Module not found: Can't resolve 'X'", add 'X'
+  to package.json dependencies and re-run npm install + npm run build until it passes.
 
 ENVIRONMENT VARIABLES (create .env.example):
-- NEXT_PUBLIC_LEMON_SQUEEZY_STORE_ID
-- NEXT_PUBLIC_LEMON_SQUEEZY_PRODUCT_ID
-- LEMON_SQUEEZY_WEBHOOK_SECRET
+- NEXT_PUBLIC_STRIPE_PAYMENT_LINK  (full URL, e.g. https://buy.stripe.com/test_XXX)
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY  (pk_test_... or pk_live_...)
+- STRIPE_WEBHOOK_SECRET  (set when webhook is wired)
+
+BUY BUTTON RULE: the Buy button's href MUST be `process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK`
+used as-is — do NOT construct URLs from a product ID, do NOT prepend any base URL,
+do NOT wrap it in an embed iframe. The link opens Stripe's hosted checkout directly.
 
 After creating all files:
 1. Run: npm install
@@ -55,26 +71,3 @@ After creating all files:
 
 Do NOT use placeholder text. Write real, helpful content for the landing page
 and the tool itself. The tool should actually work and provide value.
-
-
-PREVIOUS ATTEMPT FAILED WITH:
-Codex exited 1: Reading additional input from stdin...
-OpenAI Codex v0.121.0 (research preview)
---------
-workdir: /tmp/openclaw-builds/hn-comment-collapser
-model: gpt-5.3-codex
-provider: openai
-approval: never
-sandbox: danger-full-access
-reasoning effort: none
-reasoning summaries: none
-session id: 019d94ce-b979-7c70-aa85-8293d035fca7
---------
-user
-# Build Task: hn-comment-collapser
-
-Build a complete, production-ready Next.js 15 App Router application.
-
-PROJECT: hn-comment-collapser
-HEADLINE: Persistent comment 
-Please fix the above errors and regenerate.

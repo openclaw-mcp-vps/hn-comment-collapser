@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "HN Comment Collapser",
+  "version": "1.0.0",
+  "description": "Persistent comment collapsing for Hacker News, Reddit, GitHub issues, and forums.",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "HN Comment Collapser",
+    "default_popup": "popup.html"
+  }
+}

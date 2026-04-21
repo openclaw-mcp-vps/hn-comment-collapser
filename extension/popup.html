@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HN Comment Collapser</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        width: 340px;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background: #0d1117;
+        color: #e2e8f0;
+      }
+
+      .panel {
+        border: 1px solid #1e293b;
+        background: #0f172a;
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      label {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      input {
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: #020617;
+        color: #e2e8f0;
+        padding: 0 10px;
+      }
+
+      button {
+        border: 1px solid #334155;
+        border-radius: 8px;
+        height: 34px;
+        background: #0ea5e9;
+        color: #0f172a;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        background: #1e293b;
+        color: #e2e8f0;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .status {
+        margin-top: 10px;
+        font-size: 12px;
+        line-height: 1.45;
+        color: #cbd5e1;
+        min-height: 32px;
+      }
+
+      .hint {
+        margin-top: 8px;
+        font-size: 11px;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h1>HN Comment Collapser</h1>
+
+      <div class="field">
+        <label for="baseUrl">Web app URL</label>
+        <input id="baseUrl" type="url" placeholder="https://your-domain.com" />
+      </div>
+
+      <div class="field">
+        <label for="email">Account email</label>
+        <input id="email" type="email" placeholder="you@company.com" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Your account password" />
+      </div>
+
+      <div class="row">
+        <button id="loginButton">Connect</button>
+        <button id="syncButton" class="secondary">Sync now</button>
+      </div>
+
+      <p class="status" id="status">Set your app URL and account credentials to enable cloud sync.</p>
+      <p class="hint">Only paid accounts can receive extension sync tokens.</p>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
